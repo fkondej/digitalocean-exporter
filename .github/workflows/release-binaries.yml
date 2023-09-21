@@ -70,7 +70,7 @@ jobs:
       - name: Build binary with version override
         if: ${{ inputs.tag || startsWith(github.ref, 'refs/tags/') }}
         working-directory: 'digitalocean-exporter'
-        run: go build -ldflags '-extldflags "-static" -X github.com/metalmatze/digitalocean_exporter/main.Version=${{ inputs.tag || github.ref_name }} -X github.com/metalmatze/digitalocean_exporter/main.Revision=${{ github.ref_name }}' -o ../build/digitalocean-exporter .
+        run: go build -ldflags '-extldflags "-static" -X main.Version=${{ inputs.tag || github.ref_name }} -X main.Revision=${{ github.ref_name }}' -o ../build/digitalocean-exporter .
 
       - name: Check version
         if: ${{ env.GOARCH == 'amd64' }}
