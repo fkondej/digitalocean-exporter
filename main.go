@@ -10,8 +10,8 @@ import (
 
 	arg "github.com/alexflint/go-arg"
 	"github.com/digitalocean/godo"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/joho/godotenv"
 	"github.com/metalmatze/digitalocean_exporter/collector"
 	"github.com/prometheus/client_golang/prometheus"
