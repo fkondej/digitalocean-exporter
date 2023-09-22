@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"runtime"
@@ -40,6 +41,10 @@ type Config struct {
 	HTTPTimeout           int    `arg:"env:HTTP_TIMEOUT"`
 	WebAddr               string `arg:"env:WEB_ADDR"`
 	WebPath               string `arg:"env:WEB_PATH"`
+}
+
+func (Config) Version() string {
+	return fmt.Sprintf("digitalocean-exporter CLI %s (%s)\n", Version, Revision)
 }
 
 // Token returns a token or an error.

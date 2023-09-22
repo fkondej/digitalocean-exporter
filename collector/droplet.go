@@ -24,6 +24,7 @@ type DropletCollector struct {
 	Disk         *prometheus.Desc
 	PriceHourly  *prometheus.Desc
 	PriceMonthly *prometheus.Desc
+	UpTime       *prometheus.Desc
 }
 
 // NewDropletCollector returns a new DropletCollector.
@@ -67,6 +68,11 @@ func NewDropletCollector(logger log.Logger, errors *prometheus.CounterVec, clien
 			"Price of the Droplet billed monthly in dollars",
 			labels, nil,
 		),
+		UpTime: prometheus.NewDesc(
+			"digitalocean_droplet_uptime",
+			"Machine uptime in hours",
+			labels, nil,
+		),
 	}
 }
 
@@ -79,6 +85,7 @@ func (c *DropletCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.Disk
 	ch <- c.PriceHourly
 	ch <- c.PriceMonthly
+	ch <- c.UpTime
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
@@ -104,9 +111,7 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 
 		// append the current page's droplets to our list
-		for _, d := range dropletsPage {
-			droplets = append(droplets, d)
-		}
+		droplets = append(droplets, dropletsPage...)
 
 		// if we are at the last page, break out the for loop
 		if resp.Links == nil || resp.Links.IsLastPage() {
@@ -172,5 +177,15 @@ func (c *DropletCollector) Collect(ch chan<- prometheus.Metric) {
 			float64(droplet.Size.PriceMonthly),
 			labels...,
 		)
+		creationTime, err := time.Parse(time.RFC3339, droplet.Created)
+		if err == nil {
+			uptime := float64(time.Since(creationTime)) / float64(time.Hour)
+			ch <- prometheus.MustNewConstMetric(
+				c.UpTime,
+				prometheus.GaugeValue,
+				uptime,
+				labels...,
+			)
+		}
 	}
 }
